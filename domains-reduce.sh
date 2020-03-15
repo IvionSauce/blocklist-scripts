@@ -1,18 +1,11 @@
 #!/bin/bash
 
-# Regexp list of common bogus addresses, either remnants or errors
-# from a hosts file.
-BOGUS='0\.0\.0\.0|127\.0\.0\.1|localhost|local'
-# How relevant entries start in the hosts file.
-HOST_BEGIN='^\s*(127\.0\.0\.1|0\.0\.0\.0)'
-
 # Forcing the C locale makes rev/sort(/regex?) run _slightly_ faster, but it's
 # near negligible. While it shouldn't cause any issues - since proper domain
 # names are ASCII - there are some hosts files that do erroneously contain
 # non-ASCII characters in domain names. Unicode domain names should be punycode
 # encoded. This environment variable does ensure sort collates the way we want.
 export LC_ALL=C
-
 
 read -d '' -r awk_script << 'EOA'
 BEGIN {
@@ -31,10 +24,14 @@ $0 !~ checking {
 }
 EOA
 
-awk "$awk_script" < \
-    <(grep --text --no-filename -E "$HOST_BEGIN" "$@" \
-	  | sed -E s/"$HOST_BEGIN"'\s+(\S+).*$/\2/' \
-	  | sed -E "/^(${BOGUS})$/d" \
-	  | rev \
-	  | sort -t '.' -k 1,1 -k 2,2 -k 3,3 -k 4,4) \
-    | rev
+# Manually writing out key-indices is for chumps. Also 63 subdomains should be
+# enough for everyone.
+# Limiting this to fewer subdomains, for example 3, can shave a few seconds off
+# the runtime of sort. But I prefer the certainty of a more exhaustive sort.
+auto_keys() {
+    for i in {1..64}; do
+	printf -- "-k %s,%s " $i $i
+    done
+}
+
+rev -- "$@" | sort -u -t '.' $(auto_keys) | awk "$awk_script" | rev
