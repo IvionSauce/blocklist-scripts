@@ -37,5 +37,5 @@ auto_keys() {
 # Besides removing duplicates and subdomains we also make the assumption that
 # if the 'www' subdomain is to be blocked that we might as well block the entire
 # domain.
-sed -E 's/^www\.//' -- "$@" \
+sed -E 's/^(www\.)+(.+\..+)/\2/' -- "$@" \
     | rev | sort -u -t '.' $(auto_keys) | awk "$awk_script" | rev
