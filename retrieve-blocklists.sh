@@ -82,7 +82,3 @@ fi
 # Removing the title (first line) that really should be commented out.
 tail -n+2 simple_malvertising.txt > simple_malvertising.FIX.txt && \
     rm -f simple_malvertising.txt
-# There are more errors in SNAFU (apt), but this is the only one that cause us
-# to miss domains.
-sed 's/<BR>/\n/g' SNAFU.txt > SNAFU.FIX.txt && \
-    rm -f SNAFU.txt
