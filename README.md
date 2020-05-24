@@ -32,7 +32,7 @@ These scripts judiciously use various GNU utilities: `bash` of course, but also 
 ## Comparisons
 With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,170. Running those through a simple `sort -u` lowers it to 750,681 – so we’ve got about 250 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,948 domains, so we’ve got another 250 to 300 thousand domains that are unneeded when responding with `NXDOMAIN`.
 
-The downside to this is that `domains-reduce.sh` is about 5 to 6 times slower than just `sort -u`. Still, with about 1 million domains it does its thing in 14 to 16 seconds on my machine – which has an Intel i5-3350P and a Crucial SATA SSD. Faster would be better, and analyzing the run time shows that the awk script embedded in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
+The downside to this is that `domains-reduce.sh` is about 2 to 3 times slower than just `sort -u`. Still, with about 1 million domains it does its thing in 6 to 7 seconds on my machine – which has an Intel i5-3350P and a Crucial SATA SSD. Faster would be better, and analyzing the run time shows that `sort` command in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
 
 ## Copyright and stuff
 I can be short and clear: these scripts are released into the public domain. You are free to use, modify, share and not share them in any way you see fit.

@@ -13,14 +13,12 @@ BEGIN {
     checking=" "
 }
 
-$0 !~ checking {
+index($0, checking) != 1 {
     # Output domain name if it isn't a subdomain of the domain name we're
     # checking for.
     print $0
-    # Update the pattern we're checking for. We have to escape literal dots
-    # because this is a regexp.
-    gsub(/\./, "\\.", $0)
-    checking="^" $0 "\\..+"
+    # Update the domain we're checking for.
+    checking=$0 "."
 }
 EOA
 
