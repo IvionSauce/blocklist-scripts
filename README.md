@@ -30,7 +30,7 @@ Does not participate in the pipeline above, but downloads a number of predefined
 These scripts judiciously use various GNU utilities: `bash` of course, but also `tr`, `grep`, `awk`, `sed` and `sort`. No care was taken to ensure compatibility with non-GNU variants.
 
 ## Comparisons
-With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,170. Running those through a simple `sort -u` lowers it to 750,681 – so we’ve got about 250 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,835 domains, so we’ve got another 250 to 300 thousand domains that are unneeded when responding with `NXDOMAIN`.
+With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,170. Running those through a simple `sort -u` lowers it to 750,681 – so we’ve got about 250 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,948 domains, so we’ve got another 250 to 300 thousand domains that are unneeded when responding with `NXDOMAIN`.
 
 The downside to this is that `domains-reduce.sh` is about 5 to 6 times slower than just `sort -u`. Still, with about 1 million domains it does its thing in 14 to 16 seconds on my machine – which has an Intel i5-3350P and a Crucial SATA SSD. Faster would be better, and analyzing the run time shows that the awk script embedded in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
 
