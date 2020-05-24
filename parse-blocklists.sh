@@ -10,7 +10,7 @@ HOST_BEGIN='^\s*(127\.0\.0\.1|0\.0\.0\.0)\s+[^#]'
 # Regexp of bogus domains, either errors or remnants of a hosts file.
 BOGUS="${IPV4}|${IPV6}|"'local(host(\.localdomain)?)?'
 # The inverse of how lines in a domain list begin.
-NOT_DOMAIN_BEGIN="^\s*($|#|${IPV4}|${IPV6})"
+NOT_DOMAIN_BEGIN="^\s*($|#|${IPV4}(\s|#|$)|${IPV6})"
 
 export LC_ALL=C
 
