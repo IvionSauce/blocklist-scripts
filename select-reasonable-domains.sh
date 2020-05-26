@@ -5,7 +5,15 @@
 REASONABLE='^[[:alnum:]_-]+\.[[:alnum:]\._-]*[a-zA-Z]$'
 
 export LC_ALL=C
-# Output rejected domain names on stderr.
-cat -- "$@" \
-    | tee >(1>&2 grep --invert-match -E "$REASONABLE") \
-    | grep -E "$REASONABLE"
+
+main() {
+    # Output rejected domain names on stderr.
+    tee >(1>&2 grep --invert-match -E "$REASONABLE") \
+	| grep -E "$REASONABLE"
+}
+
+if [[ $# > 0 ]]; then
+    cat -- "$@" | main
+else
+    main
+fi
