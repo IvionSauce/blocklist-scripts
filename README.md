@@ -20,13 +20,13 @@ Takes in a list of domains and reduces domains to their topmost common domain, s
 #### select-reasonable-domains.sh [domain-file...]
 Takes in a list of domains and filters out domains that are probably errors in the source blocklists, these rejected domains are printed on stderr. This also rejects domain names containing non-ASCII characters, it is therefore prudent to run this after `map-idn-conditionally.awk`.
 
-#### remove-whitelisted.sh <whitelist-file> [domain-file...]
+#### remove-whitelisted.sh \<whitelist-file> [domain-file...]
 Takes in a list of domains and removes domains that are in the whitelist. This requires a file with whitelisted domains to be passed as the first argument.
 
 #### output-unbound-zones.awk [domain-file...]
 At the end of the pipeline this transforms the list of bare domains into the zone format Unbound uses.
 
-#### The odd one out: retrieve-blocklists.sh <save-path>
+#### The odd one out: retrieve-blocklists.sh \<save-path>
 Does not participate in the pipeline above, but downloads a number of predefined blocklists. The downloaded blocklists are stored in _save-path_.
 
 #### The sidetrack: domain-stats.awk [-v d=N] [domain-file...]
