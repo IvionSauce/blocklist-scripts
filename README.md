@@ -12,9 +12,9 @@ What follows are the scripts in the order that I use them, they’re kept sepera
 Given a number of files, either hosts files or files containing just a list of domains, will output just the domains seperated by newlines. This will be the starting point of the pipeline.
 
 #### map-idn-conditionally.awk [domain-file...]
-Takes in a list of domains and and runs domains through `idn2` when necessary.
+Takes in a list of domains and runs domains through `idn2` when necessary.
 
-#### domains-reduce.sh [domain-file...]
+#### reduce-domains.sh [domain-file...]
 Takes in a list of domains and reduces domains to their topmost common domain, so if a domain and various of its subdomains are specified in the blocklists only the domain will be output. This functionality is why I made these scripts, the rest are to facilitate this or to deal with the idiosyncrasies that come with filtering/​transforming blocklists of varying formats and quality.
 
 #### select-reasonable-domains.sh [domain-file...]
@@ -26,7 +26,7 @@ Takes in a list of domains and removes domains that are in the whitelist. This r
 #### output-unbound-zones.awk [domain-file...]
 At the end of the pipeline this transforms the list of bare domains into the zone format Unbound uses.
 
-#### The odd one out: retrieve-blocklists.sh \<save-path>
+#### The odd one out: get-blocklists.sh \<save-path>
 Does not participate in the pipeline above, but downloads a number of predefined blocklists. The downloaded blocklists are stored in _save-path_.
 
 #### The sidetrack: domain-stats.awk [-v d=N] [domain-file...]
@@ -38,9 +38,9 @@ These scripts judiciously use various GNU utilities: `bash` of course, but also 
 As the name suggests, `map-idn-conditionally.awk` depends on `idn2` from the [libidn2](https://gitlab.com/libidn/libidn2) project.
 
 ## Comparisons
-With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,197. Running those through a simple `sort -u` lowers it to 750,705 – so we’ve got about 275 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,970 domains, so we’ve got another 270 thousand domains that are unneeded when responding with `NXDOMAIN`.
+With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,197. Running those through a simple `sort -u` lowers it to 750,705 – so we’ve got about 275 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,970 domains - so there are another 270 thousand domains, that are superfluous when responding with `NXDOMAIN`.
 
-The downside to this is that `domains-reduce.sh` is about 2 to 3 times slower than just `sort -u`. But as it is multiple commands in a pipeline some of the commands can run parallel, as each is run in a subshell. The actual run time on my machine (Intel i5-3350P and a Crucial SATA SSD) is 60 to 70% slower; 4 to 5 seconds for a little over 1 million domains. Faster would be better, and analyzing the run time shows that the `sort` command in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
+The downside to this is that `domains-reduce.sh` is about 2 to 3 times slower than just `sort -u`. But as it is multiple commands in a pipeline some of the commands can run parallel, as each is run in a subshell. The actual run time on my machine (Intel i5-3350P, Crucial SATA SSD) is 60 to 70% slower; 4 to 5 seconds for a little over 1 million domains. Faster would be better, and analyzing the run time shows that the `sort` command in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
 
 ## Copyright and stuff
 I can be short and clear: these scripts are released into the public domain. You are free to use, modify, share and not share them in any way you see fit.
