@@ -1,4 +1,8 @@
 # A bit strict, ey?
 u.teknik.io
+# Breaks layout of WordPress pages
+s0.wp.com
+# Breaks layouf of some webshops
+cdn.shopify.com
 # AliExpress images
 ae01.alicdn.com
