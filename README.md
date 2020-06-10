@@ -6,7 +6,7 @@ A variety of shell (Bash) and awk scripts to whip into shape the large amounts o
 Most of these blocklists are not made or curated with the capabilities of name servers in mind. By using the `NXDOMAIN` response code a name server signals that the domain does not exist, and by extension no domains exist below said domain. We can use this [fact](https://tools.ietf.org/html/rfc8020) to further reduce the amount of domains we need to keep track of.
 
 ### Overview of scripts
-What follows are the scripts in the order that I use them, they’re kept seperate to aid in mixing and matching. All commands, except `retrieve-blocklists.sh`, output their results on stdout. Commands that optionally accept a list of files also accept input from stdin instead of those files.
+What follows are the scripts in the order that I use them, they’re kept seperate to aid in mixing and matching. All commands, except `get-blocklists.sh`, output their results on stdout. Commands that optionally accept a list of files also accept input from stdin instead of those files.
 
 #### parse-blocklists.sh [blocklist-file...]
 Given a number of files, either hosts files or files containing just a list of domains, will output just the domains seperated by newlines. This will be the starting point of the pipeline.
@@ -38,9 +38,9 @@ These scripts judiciously use various GNU utilities: `bash` of course, but also 
 As the name suggests, `map-idn-conditionally.awk` depends on `idn2` from the [libidn2](https://gitlab.com/libidn/libidn2) project.
 
 ## Comparisons
-With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,197. Running those through a simple `sort -u` lowers it to 750,705 – so we’ve got about 275 thousand straight up duplicates. Instead running the full list of domains through `domains-reduce.sh` returns 481,970 domains - so there are another 270 thousand domains, that are superfluous when responding with `NXDOMAIN`.
+With the set of blocklists I have the number of domains returned by `parse-blocklists.sh` is a little over a million: 1,025,197. Running those through a simple `sort -u` lowers it to 750,705 – so we’ve got about 275 thousand straight up duplicates. Instead running the full list of domains through `reduce-domains.sh` returns 481,970 domains – so there are another 270 thousand domains, that are superfluous when responding with `NXDOMAIN`.
 
-The downside to this is that `domains-reduce.sh` is about 2 to 3 times slower than just `sort -u`. But as it is multiple commands in a pipeline some of the commands can run parallel, as each is run in a subshell. The actual run time on my machine (Intel i5-3350P, Crucial SATA SSD) is 60 to 70% slower; 4 to 5 seconds for a little over 1 million domains. Faster would be better, and analyzing the run time shows that the `sort` command in `domains-reduce.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
+The downside to this is that `reduce-domains.sh` is about 2 to 3 times slower than just `sort -u`. But as it is multiple commands in a pipeline some of the commands can run parallel, as each is run in a subshell. The actual run time on my machine (Intel i5-3350P, Crucial SATA SSD) is 60 to 70% slower; 4 to 5 seconds for a little over 1 million domains. Faster would be better, and analyzing the run time shows that the `sort` command in `reduce-domains.sh` is where the most time is spent. Effort should be focused on optimizing that part of the pipeline, the time taken by the rest is negligible.
 
 ## Copyright and stuff
 I can be short and clear: these scripts are released into the public domain. You are free to use, modify, share and not share them in any way you see fit.
