@@ -64,18 +64,20 @@ https://raw.githubusercontent.com/HorusTeknoloji/TR-PhishingList/master/url-list
 https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser'
 
 if [ -z "$1" ]; then
-    echo "Provide a directory to download blocklists to."
+    echo "Provide a directory to download blocklists to:" >&2
+    printf '%s <save-path>\n' "$(basename "$0")" >&2
     exit 2
 fi
 cd -- "$1" || exit 1
 
-failed=""
+failed=''
 for url in $BLOCKLIST_SOURCES; do
-    wget "$url" || failed="${failed}${url}\n"
+    wget "$url" || failed="${failed}${url} "
 done
+
 if [ "$failed" ]; then
-    echo "Failed to download:"
-    echo -e "$failed"
+    echo "Failed to download:" >&2
+    printf '%s\n' $failed >&2
 fi
 
 ### WALL OF SHAME ###

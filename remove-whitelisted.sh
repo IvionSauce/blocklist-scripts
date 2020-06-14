@@ -17,8 +17,8 @@ read -d '' -r awk_script << 'EOA'
 EOA
 
 case $# in
-    0) echo "Provide a file with whitelisted domains:"
-       echo "$(basename $0) <whitelist-file> [blocklist-file...]"
+    0) echo "Provide a file with whitelisted domains:" >&2
+       printf '%s <whitelist-file> [blocklist-file...]\n' "$(basename "$0")" >&2
        exit 2 ;;
     1) wfile="$1"; rest='-' ;;
     *) wfile="$1"; shift; rest="$@" ;;
