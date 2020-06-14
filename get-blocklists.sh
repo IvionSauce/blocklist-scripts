@@ -63,7 +63,7 @@ https://urlhaus.abuse.ch/downloads/hostfile/
 https://raw.githubusercontent.com/HorusTeknoloji/TR-PhishingList/master/url-lists.txt
 https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser'
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
     echo "Provide a directory to download blocklists to."
     exit 2
 fi
@@ -73,7 +73,7 @@ failed=""
 for url in $BLOCKLIST_SOURCES; do
     wget "$url" || failed="${failed}${url}\n"
 done
-if [ $failed ]; then
+if [ "$failed" ]; then
     echo "Failed to download:"
     echo -e "$failed"
 fi

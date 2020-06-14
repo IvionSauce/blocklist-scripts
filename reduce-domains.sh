@@ -43,7 +43,7 @@ EOA
 # kind of data other people have either.
 auto-keys() {
     for i in {1..64}; do
-	printf -- "-k %s,%s " $i $i
+	printf -- '-k %s,%s ' $i $i
     done
 }
 

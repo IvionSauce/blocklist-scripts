@@ -23,7 +23,7 @@ normalize() {
 }
 pre() {
     if [[ $# > 0 ]]; then
-	for file in $@; do
+	for file in "$@"; do
 	    cat -- "$file"
 	    echo
 	done | normalize
