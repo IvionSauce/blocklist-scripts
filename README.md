@@ -14,14 +14,14 @@ Given a number of files, either hosts files or files containing just a list of d
 #### map-idn-conditionally.awk [domain-file...]
 Takes in a list of domains and runs domains through `idn2` when necessary.
 
+#### remove-whitelisted.sh \<whitelist-file> [domain-file...]
+Takes in a list of domains and removes domains that are in the whitelist. This requires a file with whitelisted domains to be passed as the first argument.
+
 #### reduce-domains.sh [domain-file...]
 Takes in a list of domains and reduces domains to their topmost common domain, so if a domain and various of its subdomains are specified in the blocklists only the domain will be output. This functionality is why I made these scripts, the rest are to facilitate this or to deal with the idiosyncrasies that come with filtering/​transforming blocklists of varying formats and quality.
 
 #### select-reasonable-domains.sh [domain-file...]
 Takes in a list of domains and filters out domains that are probably errors in the source blocklists, these rejected domains are printed on stderr. This also rejects domain names containing non-ASCII characters, it is therefore prudent to run this after `map-idn-conditionally.awk`.
-
-#### remove-whitelisted.sh \<whitelist-file> [domain-file...]
-Takes in a list of domains and removes domains that are in the whitelist. This requires a file with whitelisted domains to be passed as the first argument.
 
 #### output-unbound-zones.awk [domain-file...]
 At the end of the pipeline this transforms the list of bare domains into the zone format Unbound uses.
