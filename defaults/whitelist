@@ -1,8 +1,11 @@
 # A bit strict, ey?
 u.teknik.io
+cdn.jsdelivr.net
 # Breaks layout of WordPress pages
 s0.wp.com
-# Breaks layouf of some webshops
+# Breaks layout of some webshops
 cdn.shopify.com
 # AliExpress images
 ae01.alicdn.com
+# No need to block _all_ altervista subdomains
+altervista.org
