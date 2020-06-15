@@ -14,24 +14,24 @@ For example: let’s say we’ve got the domains `ads.example.com`, `pixel.examp
 
 ##### Help (-h / --help) output
 
-	Usage: distill.sh [option...] [blocklist-file...]
-	Distills domains in blocklist(s) to their topmost common domain. These can be
-	used by name servers to return NXDOMAIN as a means of blocking.
-	If no files are given on the commandline standard input will be assumed.
+    Usage: distill.sh [option...] [blocklist-file...]
+    Distills domains in blocklist(s) to their topmost common domain. These can be
+    used by name servers to return NXDOMAIN as a means of blocking.
+    If no files are given on the commandline standard input will be assumed.
 
-	Options:
+    Options:
 
-	  -f, --format <type>       Format of the output data. Valid types are: 'none',
-								'unbound'. Default is 'none'.
-	  -h, --help                Show this help.
-	  -o, --output <file>       Write output to file; '-' writes to standard output,
-								which is also the default.
-	  -r, --rejects <file>      Write rejected domains to file; default is
-								'/dev/null'. Writing to standard output is not
-								supported. Rejected domains are deemed to be invalid
-								domains, most likely errors in the blocklist(s).
-	  -w, --whitelist <file>    Read whitelist file and remove whitelisted domains
-								from the output.
+      -f, --format <type>       Format of the output data. Valid types are: 'none',
+                                'unbound'. Default is 'none'.
+      -h, --help                Show this help.
+      -o, --output <file>       Write output to file; '-' writes to standard output,
+                                which is also the default.
+      -r, --rejects <file>      Write rejected domains to file; default is
+                                '/dev/null'. Writing to standard output is not
+                                supported. Rejected domains are deemed to be invalid
+                                domains, most likely errors in the blocklist(s).
+      -w, --whitelist <file>    Read whitelist file and remove whitelisted domains
+                                from the output.
 
 #### The odd one out: get-blocklists.sh \<save-path>
 Does not participate in the distillation pipeline, but downloads a number of predefined blocklists. The downloaded blocklists are stored in _save-path_.
