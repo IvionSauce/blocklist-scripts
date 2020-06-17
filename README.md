@@ -3,7 +3,7 @@
 ## About
 A variety of shell (Bash) and awk scripts to whip into shape the large amounts of domains contained in common blocklists. When you combine multiple blocklists you naturally get duplicates, these are easily caught by using something like `sort -u` … but there’s more to gain if one runs their own recursive and/​or caching name server.
 
-Most of these blocklists are not made or curated with the capabilities of name servers in mind (many of these are simple [hosts](https://en.wikipedia.org/wiki/Hosts_(file)) files). By using the `NXDOMAIN` response code a name server signals that the domain does not exist, and by extension no domains exist below said domain. We can use this [fact](https://tools.ietf.org/html/rfc8020) to further reduce the amount of domains we need to keep track of.
+Most of these blocklists are not made or curated with the capabilities of name servers in mind (many are simple [hosts](https://en.wikipedia.org/wiki/Hosts_(file)) files). By using the `NXDOMAIN` response code a name server signals that the domain does not exist, and by extension no domains exist below said domain. We can use this [fact](https://tools.ietf.org/html/rfc8020) to further reduce the amount of domains we need to keep track of.
 
 ### Overview of scripts
 
@@ -34,33 +34,33 @@ For example: let’s say we’ve got the domains `ads.example.com`, `pixel.examp
                                 aren't blocked.
 
 #### Miscellaneous scripts
-`get-blocklists.sh \<save-path>`  
+**`get-blocklists.sh <save-path>`**  
 Does not participate in the distillation pipeline, but downloads a number of predefined blocklists. The downloaded blocklists are stored in _save-path_.
 
-`domain-stats.awk [-v d=N] [domain-file...]`  
-Takes in a list of domains and prints statistics on how many subdomains a domain has. Setting `d` determines the **d**epth: 1 will start aggregating and counting domains below the top-level domain, 2 will start at one domain below that, etc. Setting `d` to a negative value will instead count domain occurrences verbatim (no counting of subdomains). The default value for `d` is 2.
+**`domain-stats.awk [-v d=N] [domain-file...]`**  
+Takes in a list of domains and prints statistics on how many subdomains a domain has. Setting _d_ determines the depth: 1 will start aggregating and counting domains below the top-level domain, 2 will start at one domain below that, etc. Setting _d_ to a negative value will instead count domain occurrences verbatim (no counting of subdomains). The default value for _d_ is 2.
 
 #### Components of the distillation pipeline
 What follows are the scripts in the order that I tend to use them, which is also the order that is used in `distill.sh`. They’re kept seperate to aid in mixing and matching during development and testing. All commands output their results on stdout, and accept as input a list of files or stdin.
 
-`parse-blocklists.sh [blocklist-file...]`  
+**`parse-blocklists.sh [blocklist-file...]`**  
 Given a number of files, either hosts files or files containing just a list of domains, will output just the domains seperated by newlines. This will be the starting point of the pipeline.
 
-`map-idn-conditionally.awk [domain-file...]`  
+**`map-idn-conditionally.awk [domain-file...]`**  
 Takes in a list of domains and runs domains through `idn2` when they contain non-ASCII characters.
 
-`remove-whitelisted.sh \<whitelist-file> [domain-file...]`  
+**`remove-whitelisted.sh <whitelist-file> [domain-file...]`**  
 Takes in a list of domains and removes domains that are in the whitelist. This requires a file with whitelisted domains to be passed as the first argument. Because of the nature of `NXDOMAIN` we need to whitelist domains from the root down, so if for example `cdn.example.org` is in the whitelist file the domains `example.org` and `org` are also whitelisted.
 
-`reduce-domains.sh [domain-file...]`  
+**`reduce-domains.sh [domain-file...]`**  
 Takes in a list of domains and reduces domains to their topmost common domain, so if a domain and various of its subdomains are specified in the blocklists only the domain will be output. This functionality is why I made these scripts, the rest are to facilitate this or to deal with the idiosyncrasies that come with filtering/​transforming blocklists of varying formats and quality.
 
 It is assumed the domains are ASCII only, if this is not the case things _will_ go awry. Make sure your domains contain only ASCII characters by running `map-idn-conditionally.awk` earlier in the pipeline.
 
-`select-reasonable-domains.sh [domain-file...]`  
+**`select-reasonable-domains.sh [domain-file...]`**  
 Takes in a list of domains and filters out domains that are probably errors in the source blocklists, these rejected domains are printed on stderr. This also rejects domain names containing non-ASCII characters, it is therefore prudent to run this after `map-idn-conditionally.awk`.
 
-`output-unbound-zones.awk [domain-file...]`  
+**`output-unbound-zones.awk [domain-file...]`**  
 At the end of the pipeline this transforms the list of bare domains into the zone format Unbound uses.
 
 ### Dependencies
