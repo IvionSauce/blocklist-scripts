@@ -30,8 +30,8 @@ For example: let’s say we’ve got the domains `ads.example.com`, `pixel.examp
                                 '/dev/null'. Writing to standard output is not
                                 supported. Rejected domains are deemed to be invalid
                                 domains, most likely errors in the blocklist(s).
-      -w, --whitelist <file>    Read whitelist file and remove whitelisted domains
-                                from the output.
+      -w, --whitelist <file>    Read whitelist file and ensure whitelisted domains
+                                aren't blocked.
 
 #### Miscellaneous scripts
 `get-blocklists.sh \<save-path>`  
