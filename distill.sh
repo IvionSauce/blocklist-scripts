@@ -131,7 +131,7 @@ reduce() {
     if [[ -z $whitelist_file ]]; then
 	reduce-domains.sh
     else
-	remove-whitelisted.sh "$whitelist_file" | reduce-domains.sh
+	remove-whitelisted.awk "$whitelist_file" | reduce-domains.sh
     fi | reasonable-domains
 }
 

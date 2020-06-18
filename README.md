@@ -49,7 +49,7 @@ Given a number of files, either hosts files or files containing just a list of d
 **`map-idn-conditionally.awk [domain-file...]`**  
 Takes in a list of domains and runs domains through `idn2` when they contain non-ASCII characters.
 
-**`remove-whitelisted.sh <whitelist-file> [domain-file...]`**  
+**`remove-whitelisted.awk <whitelist-file> [domain-file...]`**  
 Takes in a list of domains and removes domains that are in the whitelist. This requires a file with whitelisted domains to be passed as the first argument. Because of the nature of `NXDOMAIN` we need to whitelist domains from the root down, so if for example `cdn.example.org` is in the whitelist file the domains `example.org` and `org` are also whitelisted.
 
 **`reduce-domains.sh [domain-file...]`**  
