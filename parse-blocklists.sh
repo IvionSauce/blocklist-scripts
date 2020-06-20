@@ -6,7 +6,7 @@ IPV4='([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}'
 IPV6='::|([[:xdigit:]]{1,4}::?){1,7}([[:xdigit:]]{1,4})?'
 
 # How relevant entries start in the hosts file.
-HOST_BEGIN='^\s*(127\.0\.0\.1|0\.0\.0\.0)\s+[^#]'
+HOST_BEGIN='^\s*(127\.0\.0\.1|0\.0\.0\.0)\s+[^#[:space:]]'
 # Regexp of bogus domains, either errors or remnants of a hosts file.
 BOGUS="${IPV4}|${IPV6}|"'local(host(\.localdomain)?)?'
 # The inverse of how lines in a domain list begin.
