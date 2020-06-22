@@ -23,11 +23,21 @@ BEGIN {
     }
 }
 
-# Read in the whitelist file and store domains in the whitelist map.
 (NR == FNR && FILENAME == ARGV[1]) {
     if (/^\s*[^#]/) {
-	# Whitelist the absolute domain name.
-	whitemap[$1]
+	# Wildcarded domain.
+	if (index($1, "*.") == 1) {
+	    # Massage it into the correct regular expression.
+	    wildcard_dom = substr($1, 2) "$"
+	    gsub(/\./, "\\.", wildcard_dom)
+
+	    wildcards[wildcard_dom]
+	}
+	# Regular domain.
+	else {
+	    # Whitelist the absolute domain name.
+	    whitemap[$1]
+	}
 
 	# Whitelist all domains from the root down, else we might have a domain
 	# up the chain returning NXDOMAIN.
@@ -44,7 +54,7 @@ BEGIN {
 	# Cheat: also add the 'www' subdomain if not explicitely stated. This
 	# runs parallel to what is done in `reduce-domains.sh`, where the 'www'
 	# subdomain is implicitly removed.
-	if (nf > 1 && fields[1] != "www") {
+	if (nf > 1 && fields[1] != "www" && fields[1] != "*") {
 	    whitemap["www." $1]
 	}
     }
@@ -52,6 +62,18 @@ BEGIN {
 }
 
 # This is run for all the input that isn't the whitelist file...
-!($0 in whitemap) {
+!($0 in whitemap || wildcarded()) {
     print $0
+}
+
+function wildcarded() {
+    # Awk doing this regexp is still much slower than using grep with
+    # --invert-match (about 10 times slower).
+    for (dom in wildcards) {
+	if (match($0, dom) > 1) {
+	    return 1
+	}
+    }
+
+    return 0
 }
