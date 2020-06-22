@@ -34,13 +34,19 @@ BEGIN {
 	nf = split($1, fields, ".")
 	# Last field is the TLD.
 	dom = fields[nf]
+	whitemap[dom]
 	# So we work our way downward, stopping short of adding the absolute
 	# domain name.
 	for (i = nf - 1; i >= 2; i--) {
-	    whitemap[dom]
 	    dom = fields[i] "." dom
+	    whitemap[dom]
 	}
-	whitemap[dom]
+	# Cheat: also add the 'www' subdomain if not explicitely stated. This
+	# runs parallel to what is done in `reduce-domains.sh`, where the 'www'
+	# subdomain is implicitly removed.
+	if (nf > 1 && fields[1] != "www") {
+	    whitemap["www." $1]
+	}
     }
     next
 }
