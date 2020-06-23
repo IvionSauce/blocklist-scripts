@@ -4,26 +4,26 @@
 # and https://backreference.org/2014/10/13/range-of-fields-in-awk/
 
 BEGIN {
-    # Error, we need at least the whitelist file as argument.
-    if (ARGC == 1) {
-	# Perform some trickery to get the script name.
-	name_cmd = "basename \"$(ps -p $PPID -o cmd= | cut -d' ' -f3)\""
-	name_cmd | getline script_name
-	close(name_cmd)
+    # Whitelist count defaults to 1.
+    if (wl_count + 0 < 1) wl_count = 1
 
-	print "Provide a file with whitelisted domains:" > "/dev/stderr"
-	print script_name " <whitelist-file> [blocklist-file...]" > \
-	    "/dev/stderr"
+    # Error, not enough arguments.
+    if (ARGC == wl_count) {
+	show_help()
 	exit 2
     }
-    # If just 1 argument, the whitelist, remove domains from stdin.
-    if (ARGC == 2) {
-	ARGV[2] = "-"
+    # Remove domains from stdin if only whitelist files on the commandline.
+    if (ARGC == wl_count + 1) {
+	ARGV[wl_count + 1] = "-"
 	ARGC++
+    }
+    # Record which files are the whitelist files.
+    for (i = 1; i <= wl_count; i++) {
+	whitelist_files[ARGV[i]]
     }
 }
 
-(NR == FNR && FILENAME == ARGV[1]) {
+(FILENAME in whitelist_files) {
     if (/^\s*[^#]/) {
 	# Wildcarded domain.
 	if (index($1, "*.") == 1) {
@@ -76,4 +76,19 @@ function wildcarded() {
     }
 
     return 0
+
+function show_help() {
+    # Perform some trickery to get the script name.
+    name_cmd = "basename \"$(ps -p $PPID -o cmd= | cut -d ' ' -f 3)\""
+    name_cmd | getline script_name
+    close(name_cmd)
+
+    OFS="\n"
+    # God, this is ugly as sin. I wish awk had heredocs or something similar.
+    print "Usage: "script_name " [-v wl_count=N] " \
+	"<whitelist-file...> [blocklist-file...]",
+	"\nReads whitelist file(s) and removes whitelisted domains from the \
+input, either", "blocklist files or standard input. Results are printed on \
+standard output.", "Setting 'wl_count' determines how many files on the \
+command line are whitelists."
 }
