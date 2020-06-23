@@ -25,10 +25,10 @@ BEGIN {
 
 (FILENAME in whitelist_files) {
     if (/^\s*[^#]/) {
-	# Wildcarded domain.
+	# Wildcard domain.
 	if (index($1, "*.") == 1) {
-	    # Massage it into the correct regular expression.
-	    wildcard_dom = substr($1, 2) "$"
+	    # Prepare domain for the `grep` command.
+	    wildcard_dom = substr($1, 3)
 	    gsub(/\./, "\\.", wildcard_dom)
 
 	    wildcards[wildcard_dom]
@@ -42,40 +42,53 @@ BEGIN {
 	# Whitelist all domains from the root down, else we might have a domain
 	# up the chain returning NXDOMAIN.
 	nf = split($1, fields, ".")
-	# Last field is the TLD.
-	dom = fields[nf]
-	whitemap[dom]
-	# So we work our way downward, stopping short of adding the absolute
-	# domain name.
-	for (i = nf - 1; i >= 2; i--) {
-	    dom = fields[i] "." dom
+	if (nf > 1) {
+	    # Last field is the TLD.
+	    dom = fields[nf]
 	    whitemap[dom]
-	}
-	# Cheat: also add the 'www' subdomain if not explicitely stated. This
-	# runs parallel to what is done in `reduce-domains.sh`, where the 'www'
-	# subdomain is implicitly removed.
-	if (nf > 1 && fields[1] != "www" && fields[1] != "*") {
-	    whitemap["www." $1]
+	    # So we work our way downward, stopping short of adding the whole
+	    # domain name (either wildcard or absolute).
+	    for (i = nf - 1; i >= 2; i--) {
+		dom = fields[i] "." dom
+		whitemap[dom]
+	    }
+	    # Cheat: also add the 'www' subdomain if not explicitely stated.
+	    # This runs parallel to what is done in `reduce-domains.sh`, where
+	    # the 'www' subdomain is implicitly removed.
+	    if (fields[1] != "www" && fields[1] != "*") {
+		whitemap["www." $1]
+	    }
 	}
     }
     next
 }
 
-# This is run for all the input that isn't the whitelist file...
-!($0 in whitemap || wildcarded()) {
-    print $0
+# This is run for all the input that isn't a whitelist file...
+!($0 in whitemap) {
+    if (wildcarded()) print $0 | grep_cmd
+    else print $0
+}
+
+END {
+    close(grep_cmd)
 }
 
 function wildcarded() {
-    # Awk doing this regexp is still much slower than using grep with
-    # --invert-match (about 10 times slower).
-    for (dom in wildcards) {
-	if (match($0, dom) > 1) {
-	    return 1
+    if (length(wildcards) == 0) return 0
+
+    # Using a pure awk implementation is much too slow for more than a few
+    # wildcard domain entries, so we call in the cavalry.
+    if (length(grep_cmd) == 0) {
+	grep_cmd = "grep --invert-match -E '\\.("
+	for (dom in wildcards) {
+	    grep_cmd = grep_cmd dom "|"
 	}
+
+	grep_cmd = substr(grep_cmd, 1, length(grep_cmd) - 1) ")$'"
     }
 
-    return 0
+    return 1
+}
 
 function show_help() {
     # Perform some trickery to get the script name.
