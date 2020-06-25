@@ -4,7 +4,7 @@
 # Commandline argument handling
 # -----------------------------
 
-whitelist_file=''
+whitelist_files=()
 rejected='/dev/null'
 output_format='none'
 output='-'
@@ -28,7 +28,8 @@ Options:
 			    supported. Rejected domains are deemed to be invalid
 			    domains, most likely errors in the blocklist(s).
   -w, --whitelist <file>    Read whitelist file and ensure whitelisted domains
-			    aren't blocked.
+			    aren't blocked. This option can be used multiple
+			    times to specify more than one whitelist file.
 EOF
 }
 
@@ -69,7 +70,7 @@ while :; do
 	    ;;
 	-w|--whitelist)
 	    if [[ $2 ]]; then
-		whitelist_file="$2"
+		whitelist_files+=("$2")
 		shift
 	    else
 		missing "whitelist file" $1
@@ -127,11 +128,13 @@ reasonable-domains() {
 }
 
 reduce() {
-    # Add in the whitelist step if we got a whitelist.
-    if [[ -z $whitelist_file ]]; then
+    # Add in the whitelist step if we got at least one whitelist.
+    local count=${#whitelist_files[@]}
+    if [[ $count -eq 0 ]]; then
 	reduce-domains.sh
     else
-	remove-whitelisted.awk "$whitelist_file" | reduce-domains.sh
+	remove-whitelisted.sh -w $count \
+			      "${whitelist_files[@]}" | reduce-domains.sh
     fi | reasonable-domains
 }
 
