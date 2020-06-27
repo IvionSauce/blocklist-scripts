@@ -4,17 +4,36 @@ wl_count=1
 
 show-help() {
     cat << EOF
-Usage: $(basename "$0") [-w N] <whitelist-file...> [domainlist-file...]
+Usage: $(basename "$0") [option] <whitelist-file...> [domainlist-file...]
 Reads whitelist file(s) and removes whitelisted domains from the input, which is
-either standard input or files given on the commandline. Multiple whitelist
-files are possible by using the -w option and specifying the count N.
+either standard input or files given on the commandline.
+
+Options:
+
+  -h, --help    Show this help.
+  -p            Run in pipe mode, which means that all the files on the
+		commandline are taken to be whitelist files.
+  -w <count>	The first 'count' files are taken to be whitelist files, the
+		rest are domainlist files. Defaults to 1.
+
+Specifying more than one option is unsupported.
 EOF
 }
 
 case $1 in
+    -h|--help)
+	show-help >&2
+	exit 0
+	;;
+    -p)
+	shift
+	if [[ $# -gt 1 ]]; then
+	    wl_count=$#
+	fi
+	;;
     -w)
 	shift
-	if [[ $1 =~ ^[0-9]+$ ]]; then
+	if [[ $1 =~ ^[1-9][0-9]*$ ]]; then
 	    wl_count=$1
 	    shift
 	else
@@ -22,10 +41,6 @@ case $1 in
 		   "$1" >&2
 	    exit 3
 	fi
-	;;
-    -h|--help)
-	show-help >&2
-	exit 0
 	;;
     --) shift ;;
 esac
