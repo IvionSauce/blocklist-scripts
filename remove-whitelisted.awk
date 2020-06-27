@@ -22,15 +22,30 @@ BEGIN {
     }
 }
 
+# Parse the whitelists into 2 structures:
+# 1) An associative array that functions as a set - `whitemap`
+# 2) A string containing regex patterns - `re_delete`
+# The first is to filter out domain names specified verbatim. The second one is
+# used to instruct `grep` with regex patterns to remove; these patterns are
+# either specified directly or derived from wildcard domains.
+# Using this two-pronged approach gives us speed and scalability, although too
+# many regexes will still cause significant slowdowns.
 (FILENAME in whitelist_files) {
     if (/^\s*[^#]/) {
+	# Regular expression.
+	if (index($1, "/") == 1) {
+	    if (split($1, regex, "/") > 1) {
+		re_delete = re_delete regex[2] "\n"
+	    }
+	    # Not a domain, skip the rest.
+	    next
+	}
 	# Wildcard domain.
-	if (index($1, "*.") == 1 && length($1) > 2) {
-	    # Prepare domain for the `grep` command.
+	else if (index($1, "*.") == 1 && length($1) > 2) {
 	    wildcard_dom = substr($1, 2)
 	    gsub(/\./, "\\.", wildcard_dom)
 
-	    wildcards = wildcards wildcard_dom "$\n"
+	    re_delete = re_delete wildcard_dom "$\n"
 	}
 	# Regular domain.
 	else {
@@ -66,9 +81,9 @@ BEGIN {
 # pipeline is. We do this because piping to grep in awk somehow works out to be
 # a lot slower than doing the pipe in the (calling) shell.
 !printed_next_step {
-    if (wildcards) {
+    if (re_delete) {
 	print "grep --invert-match -E '" \
-	    substr(wildcards, 0, length(wildcards) - 1) "'" \
+	    substr(re_delete, 0, length(re_delete) - 1) "'" \
 	    > next_step_out
     }
     else {
