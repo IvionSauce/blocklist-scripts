@@ -129,12 +129,10 @@ reasonable-domains() {
 
 reduce() {
     # Add in the whitelist step if we got at least one whitelist.
-    local count=${#whitelist_files[@]}
-    if [[ $count -eq 0 ]]; then
+    if [[ ${#whitelist_files[@]} -eq 0 ]]; then
 	reduce-domains.sh
     else
-	remove-whitelisted.sh -w $count \
-			      "${whitelist_files[@]}" | reduce-domains.sh
+	remove-whitelisted.sh -p "${whitelist_files[@]}" | reduce-domains.sh
     fi | reasonable-domains
 }
 
